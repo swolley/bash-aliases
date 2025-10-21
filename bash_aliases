@@ -27,24 +27,33 @@ eos-search() {
 __pkgmgr() {
 	local pkgmgr="$1"
 	local action="$2"
-	
-	shift 2
-	
-	if [ "$action" = "search" ]; then
-        command "$pkgmgr" -Ss "$@"
-    elif [ "$action" = "update" ]; then
-        command "$pkgmgr" -Su "$@"
-    elif [ "$action" = "install" ]; then
-        command "$pkgmgr" -S "$@"
-    elif [ "$action" = "remove" ]; then
-        command "$pkgmgr" -R "$@"
-    elif [ "$action" = "info" ]; then
-        command "$pkgmgr" -Si "$@"
-    elif [ "$action" = "autoremove" ]; then
-        __safe_autoremove "$pkgmgr" "$@"
-    else
-        command "$pkgmgr" "$@"
-    fi
+
+	shift 1
+
+	if [[ "$@" == -* ]]; then
+    	command "$pkgmgr" "$@"
+	else
+		shift 1
+
+		if [ "$action" = "search" ]; then
+			command "$pkgmgr" -Ss "$@" || echo "No matches found"
+		elif [ "$action" = "update" ]; then
+			command "$pkgmgr" -Su "$@"
+		elif [ "$action" = "install" ]; then
+			command "$pkgmgr" -S "$@"
+		elif [ "$action" = "remove" ]; then
+			command "$pkgmgr" -R "$@"
+		elif [ "$action" = "info" ]; then
+			command "$pkgmgr" -Si "$@" || echo "No matches found"
+		elif [ "$action" = "autoremove" ]; then
+			__safe_autoremove "$pkgmgr" "$@"
+		elif [ "$action" = "installed" ]; then
+			command "$pkgmgr" -Qs "$@"
+		else
+			echo "❌ Invalid option: $action"
+		fi
+	fi
+
 }
 
 __safe_autoremove() {
@@ -136,17 +145,20 @@ __safe_autoremove() {
 	esac
 }
 
-pacman() {
-    __pkgmgr "pacman" "$1"
-}
+#TODO: not completed
+#pacman() {
+#    __pkgmgr "pacman" "$@"
+#}
 
-paru() {
-    __pkgmgr "paru" "$1"
-}
+#TODO: not completed
+#paru() {
+#    __pkgmgr "paru" "$@"
+#}
 
-yay() {
-    __pkgmgr "yay" "$1"
-}
+#TODO: not completed
+#yay() {
+#    __pkgmgr "yay" "$@"
+#}
 
 html() {
 	local base_path="/srv/http"
@@ -156,3 +168,4 @@ html() {
         cd /srv/http
     fi
 }
+
